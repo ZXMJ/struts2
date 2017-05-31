@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE validators PUBLIC
+        "-//Apache Struts//XWork Validator Definition 1.0//EN"
+        "http://struts.apache.org/dtds/xwork-validator-definition-1.0.dtd">
+
+<!-- START SNIPPET: validators-default -->
+<validators>
+	<!-- 配置自定义 验证器(参看struts2自带验证器配置文件com.opensymphony.xwork2.validator.validators default.xml) -->
+	<validator name="IDCard" class="com.ultra.validator.IDCardValidator"></validator>
+</validators>

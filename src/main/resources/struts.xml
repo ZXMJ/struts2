@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+	"http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+	
+	<!-- 使用国际化配置文件(.properties) -->
+	<constant name="struts.custom.i18n.resources" value="i18n"></constant>
+	<!-- 
+		constant:常量(默认值在default.properties中配置) 
+		struts.action.extension:action接受的默认请求的后缀名(逗号后为空表示无后缀名)默认action和空 
+		注意:web.xml中过滤器的配置拦截参数/*而不能是*.action
+	-->
+	<constant name="struts.action.extension" value="action,do,"></constant>
+
+	<!-- struts.enable.DynamicMethodInvocation是否接受动态方法请求默认false -->
+	<!-- scheme://ip:port/contextPath/actionName!mothodName后缀名 示例:http://localhost:8888/struts2/testDynamicMethodInvocationAction!update.action -->
+	<constant name="struts.enable.DynamicMethodInvocation" value="true"></constant>
+
+	<!-- 调用public类的public静态方法的开关 -->
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true"></constant>
+
+	<!-- 
+		package name:用于标识该包，和被继承。 
+		extends:继承一个包，值是被继承的包名。 
+		namespace:命名空间。默认值/。
+		url=http://ip:port/contextPath/servletPath?prarm1&param2 
+		servletPath=namespace+actionName+后缀名
+	-->
+	<package name="helloword" extends="struts-default" namespace="/">
+		
+		<!-- 全局声明式异常处理 -->
+		<global-results>
+			<result name="exception">/A030Exception.jsp</result>
+		</global-results>
+
+		<!-- 允许使用的通配符 -->
+		<global-allowed-methods>regex:.*</global-allowed-methods>
+
+		<!-- 全局声明式异常 -->
+		<global-exception-mappings> 
+			<exception-mapping result="exception" exception="java.lang.ArithmeticException"></exception-mapping>
+		</global-exception-mappings>
+		
+		<!-- 
+			action name:进入该action的路径。即actionName。 
+			class:处理该请求的类的全路径。默认com.opensymphony.xwork2.ActionSupport。在struts-default.xml中有配置。 
+			method:处理该请求的方法名。默认execute。
+			result name:进入该result的路径。默认值success。与action中method的返回值对应。 
+			type:进入该result的方式。默认dispatcher。 
+		-->
+		<action name="input" class="com.opensymphony.xwork2.ActionSupport"
+			method="execute">
+			<result name="success" type="dispatcher">/WEB-INF/pages/input.jsp</result>
+		</action>
+
+		<action name="save" class="com.ultra.bean.Product"
+			method="save">
+			<result name="details" type="dispatcher">/WEB-INF/pages/detailsOGNL.jsp
+			</result>
+			<result name="input" type="dispatcher">/WEB-INF/pages/input.jsp</result>
+		</action>
+
+		<!-- 获取域对象操作map的action -->
+
+		<action name="testActionContext"
+			class="com.ultra.action.A010ActionContextAction解耦方式获取域对象操作的Map">
+			<result>/A030ActionContext.jsp</result>
+		</action>
+
+		<action name="testAware" class="com.ultra.action.A020AwareAction耦合方式获取域对象操作的Map">
+			<result>/A020ActionAware.jsp</result>
+		</action>
+
+		<!-- 获取域对象的action -->
+
+		<action name="testServletActionContext"
+			class="com.ultra.action.A030ServletActionContextAction解耦方式获取域对象">
+			<result>/result/success.jsp</result>
+		</action>
+
+		<action name="testServletAware" class="com.ultra.action.A040ServletAwareAction耦合方式获取域对象">
+			<result>/result/success.jsp</result>
+		</action>
+
+		<!-- action子节点result的type的取值 -->
+
+		<action name="testResult" class="com.ultra.action.A060ResutTypeAction"
+			method="execute">
+
+			<result name="dispatcher" type="dispatcher">/result/success.jsp</result>
+
+			<result name="redirect" type="redirect">/result/success.jsp</result>
+
+			<result name="chain" type="chain">
+				<param name="actionName">index</param>
+				<param name="namespace">/ultra</param>
+			</result>
+
+			<result name="redirectAction" type="redirectAction">
+				<param name="actionName">index</param>
+				<param name="namespace">/ultra</param>
+			</result>
+
+			<result name="redirectActionByRedirect" type="redirect">/ultra/index.action
+			</result>
+
+		</action>
+
+		<!-- 
+			通配符 (类和方法同时通配) 
+			<action name="*/*" class="com.ultra.action.{1}" method="{2}"> 
+				<result name="{2}">/{2}.jsp</result> 
+			</action> 
+		-->
+		<action name="product-*" class="com.ultra.action.A070WildcardAction通配符"
+			method="{1}">
+			<result name="{1}">/result/{1}.jsp</result>
+		</action>
+
+		<!-- 动态方法调用 -->
+		<action name="testDynamicMethodInvocationAction"
+			class="com.ultra.action.A080DynamicMethodInvocationAction" method="save">
+			<result>/result/success.jsp</result>
+		</action>
+
+		<!-- 声明式异常处理 -->
+		<action name="testExceptionMappingInterceptor" class="com.ultra.action.A090ExceptionMappingInterceptorAction">
+			<!-- exception-mapping exception:捕获异常的种类 result:捕获异常后跳转的result -->
+			<!-- 只捕获一个action的异常 -->
+			<!-- <exception-mapping result="exception"
+				exception="java.lang.ArithmeticException"></exception-mapping>
+			<result name="exception">/A030Exception.jsp</result> -->
+			<result>/A010Index.jsp</result>
+		</action>
+
+		<action name="testTag" class="com.ultra.bean.Product"
+			method="tag">
+			<result name="tag">/A050Tag.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 测试namespace -->
+	<package name="index" extends="struts-default" namespace="/ultra">
+		<action name="index">
+			<result>/A010Index.jsp</result>
+		</action>
+	</package>
+
+	<!-- emp项目练习 -->
+	<package name="emp" extends="struts-default" namespace="/">
+		<!-- 
+			配置顺序(顺序错误时的报错)
+			result-types,interceptors,default-interceptor-ref,default-action-ref,default-class-ref,global-results,global-allowed-methods,global-exception-mappings,action*
+		-->
+		
+		<interceptors>
+			<!-- 自定义拦截器 -->
+			<interceptor-stack name="noPrepareStack">
+				<!-- 继承的拦截器 -->
+				<interceptor-ref name="paramsPrepareParamsStack">
+					<!-- 把prepare拦截器的alwaysInvokePrepare属性置为false -->
+					<param name="prepare.alwaysInvokePrepare">false</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		
+		<!-- 指定默认的拦截器链 -->
+		<default-interceptor-ref name="noPrepareStack"/>
+		
+		<!-- 允许使用的通配符 -->
+		<global-allowed-methods>regex:.*</global-allowed-methods>
+
+		<action name="emp-*" class="com.ultra.emp.action.EmpModelDrivenPreparableAction" method="{1}">
+			<result name="{1}">/WEB-INF/emp/{1}.jsp</result>
+			<result name="success" type="redirectAction">emp-list.action</result>
+			<result name="list">/WEB-INF/emp/list.jsp</result>
+		</action>
+		
+		<action name="testConvert" class="com.ultra.action.A100ConvertAction" method="execute">
+			<result name="input">/A070convert.jsp</result>
+		</action>
+		
+		<action name="testI18N" class="com.ultra.action.A110I18NAction">
+			<result>/A080i18n.jsp</result>
+		</action>
+		
+		<action name="testValidation" class="com.ultra.action.A120ValidationAction">
+			<result>/result/success.jsp</result>
+			<result name="input">/A090Validation.jsp</result>
+		</action>
+		
+		<action name="testUpload" class="com.ultra.action.A130UploadAction">
+			<interceptor-ref name="defaultStack">
+				<!-- 上传条件约束 -->
+				<param name="fileUpload.maximumSize">1024*3</param>
+				<param name="fileUpload.allowedTypes">application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+				<param name="fileUpload.allowedExtensions">.txt,.pdf,.xlsx,.docx</param>
+			</interceptor-ref>
+			<result>/result/success.jsp</result>
+			<result name="input">/A100Upload.jsp</result>
+		</action>
+		<!-- 表单重复提交 -->
+		<action name="testToken" class="com.ultra.action.A140TokenAction">
+			<!-- 使用tokenSession拦截器时，表单的重复提交时，拦截器会过滤掉请求，流程会继续，不起作用 -->
+			<interceptor-ref name="tokenSession"></interceptor-ref>
+			<!-- 使用token拦截器时需要配置失败跳转的页面 -->
+			<!-- <interceptor-ref name="token"></interceptor-ref> -->
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			<result>/result/success.jsp</result>
+			<!-- <result name="invalid.token">/result/error.jsp</result> -->
+		</action>
+	</package>
+</struts>
+
+

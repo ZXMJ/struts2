@@ -1,0 +1,32 @@
+<!DOCTYPE validators PUBLIC
+  		"-//Apache Struts//XWork Validator 1.0.3//EN"
+  		"http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+	<!-- 字段验证器 (短路验证开关，前面的失败，后面的不在验证:short-circuit="true") -->
+	<field name="age">
+		<field-validator type="int" short-circuit="true">
+			<param name="min">20</param>
+			<param name="max">50</param>
+			<message key="error.int"></message>
+		</field-validator>
+	</field>
+	<!-- 两个同类型校验器共用一个错误信息:message标签 key属性一样 -->
+	<field name="count">
+		<field-validator type="int">
+			<param name="min">1</param>
+			<param name="max">10</param>
+			<message key="error.int"></message>
+		</field-validator>
+	</field>
+	<field name="idCard">
+		<field-validator type="IDCard">
+			<message>IdCard is invalid</message>
+		</field-validator>
+	</field>
+	<!-- 表达式验证器 -->
+	<validator type="expression" short-circuit="true">
+		<param name="expression">pass.equals(pass2)</param>
+		<message key="pass"></message>
+	</validator>
+	
+</validators>
